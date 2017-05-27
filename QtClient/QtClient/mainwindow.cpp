@@ -50,7 +50,6 @@ MainWindow::MainWindow(QWidget *parent) :
         QBrush(Qt::red), QPen(Qt::white,1), QSize(6,6));
     //添加样本点形状
     curve->setSymbol(symbol);
-
     //ui->qwtPlot_5->show();
     curve->attach(ui->qwtPlot_5);
     ui->qwtPlot->replot();
@@ -72,7 +71,7 @@ void MainWindow::updateClock(){
     //每秒更新一下statusBar上的时间
     ui->statusBar->showMessage(QString("   ") + QString("%1").arg(QTime::currentTime().toString("H:m a")));
 }
-
+/*
 TimeScaleDrawR::TimeScaleDrawR(const QDateTime &base):  m_scaleBaseTime(base){
 
 }
@@ -83,7 +82,7 @@ QwtText TimeScaleDrawR::label(double v) const{
     return upTime.toString("yyyy-MM-dd\n hh:mm:ss");
 }
 
-
+*/
 
 
 

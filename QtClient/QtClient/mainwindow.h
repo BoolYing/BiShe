@@ -34,6 +34,7 @@ private slots:
  * virtual QwtText label(double v) const ;
  * 因此，我们只要重写这个虚函数就能满足我们的需要——以时间为横轴 。
  */
+/*
 class TimeScaleDrawR : public QwtScaleDraw
 {
 public:
@@ -43,7 +44,7 @@ private:
     QDateTime m_scaleBaseTime;
 };
 
-
+*/
 
 
 
