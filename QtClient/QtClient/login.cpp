@@ -61,6 +61,10 @@ login::login(QWidget *parent) :
     connect(minButton,SIGNAL(clicked()),this,SLOT(showMinimized()));
     connect(closeButton,SIGNAL(clicked()),this,SLOT(close()));
 
+    login_tcpSocket = new QTcpSocket(this);
+    //connect(login_tcpSocket,&QTcpSocket::readyRead,this,&MainWindow::readMessage);
+    connect(login_tcpSocket,SIGNAL(error(QAbstractSocket::SocketError)),this,SLOT(displayError(QAbstractSocket::SocketError)));
+
 }
 
 login::~login()
@@ -68,8 +72,20 @@ login::~login()
     delete ui;
 }
 bool login::user_exist_true(QString user,QString passwd){
-
-    return true;
+    QString result;
+    login_tcpSocket->abort(); //取消已有的连接
+    QString request = "1";
+    QString info = user + "," + passwd;
+    login_tcpSocket->connectToHost(QHostAddress("192.168.19.128"),8955);
+    login_tcpSocket->write(request.toLocal8Bit());
+    login_tcpSocket->write(info.toLocal8Bit());
+    if(login_tcpSocket->waitForReadyRead(3000)){ //有数据可读则返回
+        result = readMessage();//读取数据
+        if(result == "yes"){//判断返回值
+            return true;
+        }
+    }
+    return false;
 }
 
 void login::Set_Time(){
@@ -129,3 +145,23 @@ void login::mouseMoveEvent(QMouseEvent *e) //鼠标移动事件响应
         e->accept();
     }
 }
+
+void login::displayError(QAbstractSocket::SocketError)
+{
+    qDebug()<<login_tcpSocket->errorString(); //输出错误信息
+}
+QString login::readMessage()
+{
+    QByteArray buffer;
+    //读取缓冲区数据
+    buffer = login_tcpSocket->readAll();
+    QString result(buffer);
+    return result;
+    /*QString buf = QString::fromLocal8Bit(buffer);
+    QStringList list;
+    list = buf.split("\n");
+    for(int it = 0;it <list.size();it++){
+        qDebug() << list.at(it);
+    }*/
+}
+

@@ -16,7 +16,8 @@
 #include<QMouseEvent>
 #include<QLabel>
 #include<QToolButton>
-
+#include<QTcpSocket>
+#include<QHostAddress>
 
 namespace Ui {
 class login;
@@ -35,11 +36,13 @@ private slots:
     void on_pushButton_2_clicked();
     bool user_exist_true(QString user,QString passwd);
     void Set_Time();
-
+    QString readMessage();
+    void displayError(QAbstractSocket::SocketError);  //显示错误
 private:
     Ui::login *ui;
     QPoint relativePos;
     bool mouse_move_tag;
+    QTcpSocket * login_tcpSocket;
     //QSqlDatabase db;
 protected :
     void mouseMoveEvent ( QMouseEvent * e );

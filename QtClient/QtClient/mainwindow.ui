@@ -326,7 +326,7 @@
            <item>
             <widget class="QLabel" name="label">
              <property name="text">
-              <string>TextLabel</string>
+              <string>城市代码列表</string>
              </property>
             </widget>
            </item>

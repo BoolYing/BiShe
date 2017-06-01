@@ -5,7 +5,7 @@
 #
 #-------------------------------------------------
 
-QT       += core gui sql
+QT       += core gui sql network
 
 DEFINES += QT_DLL QWT_DLL
 LIBS += -L"C:\Qt\Qt5.8.0\5.8\msvc2015_64\lib" -lqwtd
