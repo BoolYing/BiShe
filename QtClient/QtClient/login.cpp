@@ -106,6 +106,7 @@ void login::on_pushButton_clicked()
     }
     else{
         qDebug()<<"OK"<<endl;
+        _UserName_ = user;
         accept();
     }
 }
@@ -148,7 +149,7 @@ void login::mouseMoveEvent(QMouseEvent *e) //鼠标移动事件响应
 
 void login::displayError(QAbstractSocket::SocketError)
 {
-    qDebug()<<login_tcpSocket->errorString(); //输出错误信息
+    qDebug()<<VNAME(login_tcpSocket)<<"--> : "<<login_tcpSocket->errorString(); //输出错误信息
 }
 QString login::readMessage()
 {

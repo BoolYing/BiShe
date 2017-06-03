@@ -19,6 +19,9 @@
 #include<QTcpSocket>
 #include<QHostAddress>
 
+#define VNAME(name) (#name)//用来输出变量名
+extern QString _UserName_;//使用main.cpp中定义的全局变量
+
 namespace Ui {
 class login;
 }
@@ -45,11 +48,9 @@ private:
     QTcpSocket * login_tcpSocket;
     //QSqlDatabase db;
 protected :
-    void mouseMoveEvent ( QMouseEvent * e );
-    void mousePressEvent ( QMouseEvent * e );
-    void mouseReleaseEvent (  QMouseEvent * e );
-    // void mouseDoubleClickEvent( QMouseEvent * e );
-
+    void mouseMoveEvent ( QMouseEvent * e ); //鼠标移动事件响应
+    void mousePressEvent ( QMouseEvent * e ); //鼠标单击事件响应
+    void mouseReleaseEvent (  QMouseEvent * e ); //鼠标松开事件响应
 };
 
 #endif // LOGIN_H
