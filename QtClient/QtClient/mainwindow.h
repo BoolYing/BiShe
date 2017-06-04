@@ -82,6 +82,8 @@ private slots:
     void update_weather_info();
     void update_ui(QString city_code);
     void on_listWidget_clicked(const QModelIndex &index);
+    void on_pushButton_2_clicked();
+    void on_pushButton_3_clicked();
 };
 
 /*

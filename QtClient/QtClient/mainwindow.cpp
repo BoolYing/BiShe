@@ -8,13 +8,13 @@ MainWindow::MainWindow(QWidget *parent) :
     ui->setupUi(this);
     qDebug() << "username is :"<<_UserName_;
     //创建七条曲线，用来存储未来七天数据。
-    curve_0=new QwtPlotCurve("Temp");
-    curve_1=new QwtPlotCurve("Temp");
-    curve_2=new QwtPlotCurve("Temp");
-    curve_3=new QwtPlotCurve("Temp");
-    curve_4=new QwtPlotCurve("Temp");
-    curve_5=new QwtPlotCurve("Temp");
-    curve_6=new QwtPlotCurve("Temp");
+    curve_0=new QwtPlotCurve();
+    curve_1=new QwtPlotCurve();
+    curve_2=new QwtPlotCurve();
+    curve_3=new QwtPlotCurve();
+    curve_4=new QwtPlotCurve();
+    curve_5=new QwtPlotCurve();
+    curve_6=new QwtPlotCurve();
     //创建字符串到qwt指针变量的映射
     str_2_qwt.insert("qwtPlot_0",ui->qwtPlot_0);
     str_2_qwt.insert("qwtPlot_1",ui->qwtPlot_1);
@@ -67,8 +67,7 @@ MainWindow::MainWindow(QWidget *parent) :
     weather7day_Socket     = new QTcpSocket(this);
     weather7day_full_Socket= new QTcpSocket(this); 
 
-    update_weather_info();
-    update_ui(vector_user_info[0]);
+    on_pushButton_3_clicked();//主动触发一次更新数据与更新ui的操作
 
     timer_updateClock.start(1000);//定时器，用来刷新时钟部件
     connect(&timer_updateClock,SIGNAL(timeout()),this,SLOT(updateClock()));
@@ -146,15 +145,38 @@ void MainWindow::get_user_info(){
             qDebug() << list.at(i);
         }
     }
-
 }
 
 void MainWindow::set_register_city(){
 
 }
 
+//获取全国省、区、县的天气代码
 void MainWindow::get_city_code(){
-
+    QString buf;
+    user_info_Socket->abort(); //取消已有的连接
+    QString request = "5";
+    city_code_Socket->connectToHost(QHostAddress("192.168.19.128"),8955);
+    city_code_Socket->write(request.toLocal8Bit());
+    if(city_code_Socket->waitForReadyRead(3000)){ //有数据可读则返回
+        buf = readMessage(city_code_Socket);//读取数据
+        //qDebug()<<buf;
+        QStringList item_list;
+        item_list = buf.split(";");
+        for(int i = 0;i <item_list.size();i++){
+            if(item_list.at(i)=="") continue;
+            qDebug()<<item_list.at(i);
+            QStringList value_list = QString(item_list.at(i)).split(",");
+            Item item;
+            for(int j = 0;j< value_list.size();j++){
+                if(value_list.at(j) == "") continue;
+                item.str[j] = value_list.at(j);
+                //qDebug()<<value_list.at(j);
+            }
+            vector_city_code.push_back(item);
+            //qDebug()<<item[0]<<","<<item[1]<<","<<item[2]<<","<<item[3]<<","<<item[4]<<","<<item[5]<<","<<item[6]<<","<<item[7];
+        }
+    }
 }
 
 void MainWindow::get_weather7day(){
@@ -242,11 +264,13 @@ void MainWindow::update_ui(QString city_code){
     QVector<Item> temp_full;//保存当前城市七天内的详细数据
     QVector<Item>::iterator it;
     QVector<Item>::iterator jt;
+    //获取当前城市的天气走向
     for(it = vector_weather7day.begin();it != vector_weather7day.end();it++){
         if(it->str[0] == city_code){
             temp.push_back(*it);
         }
     }
+    //获取当前城市的详细天气信息
     for(it = vector_weather7day_full.begin();it != vector_weather7day_full.end();it++){
         if(it->str[0] == city_code){
             temp_full.push_back(*it);
@@ -278,15 +302,10 @@ void MainWindow::update_ui(QString city_code){
         //QwtPlotCurve *curve=new QwtPlotCurve("Temp");
         curve->setSamples(xs,ys);
         curve->attach(str_2_qwt[QString("qwtPlot_")+QString(cnt_str)]);
-
-        //str_2_qwt[QString("qwtPlot_")+QString(cnt_str)]->setAxisScale( QwtPlot::yLeft, 10.0, 35.0 );
-
         str_2_qwt[QString("qwtPlot_")+QString(cnt_str)]->replot();
-
-
     }
 
-    qDebug()<<"testtttttttt-->"<<temp_full[0].str[1];
+/*    qDebug()<<"testtttttttt-->"<<temp_full[0].str[1];
     qDebug()<<"String size-->"<<temp_full[0].str[1].size();
 
     qDebug()<<"Date-->"<<QString(
@@ -297,13 +316,42 @@ void MainWindow::update_ui(QString city_code){
                                  QString(temp_full[0].str[1][3])
                                 +QString(temp_full[0].str[1][4])
                                 ).toInt();
-
-
-
+*/
 }
 
 void MainWindow::update_weather_info(){
+    vector_user_info.clear();
+    vector_weather7day.clear();
+    vector_weather7day_full.clear();
+    ui->listWidget->clear();
     get_user_info();//获取一次关注的城市列表，并追加到list_widget上
     get_weather7day_full();//未来七天详细信息
     get_weather7day();//七天天气走向
+}
+
+//注册城市
+void MainWindow::on_pushButton_2_clicked()
+{
+    QString province = ui->listWidget_2->currentItem()->text();
+    QString city = ui->listWidget_3->currentItem()->text();
+    QString area = ui->listWidget_4->currentItem()->text();
+
+
+}
+//更新数据，并刷新ui
+void MainWindow::on_pushButton_3_clicked()
+{
+    update_weather_info();
+    update_ui(vector_user_info[0]);
+}
+//选择省，则更新对应的市
+void MainWindow::on_listWidget_2_clicked(const QModelIndex &index)
+{
+
+
+}
+//选择市，则更新对应的区
+void MainWindow::on_listWidget_3_clicked(const QModelIndex &index)
+{
+
 }

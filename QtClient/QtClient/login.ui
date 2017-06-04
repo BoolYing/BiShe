@@ -23,7 +23,7 @@
     </rect>
    </property>
    <property name="text">
-    <string>Weather forecast</string>
+    <string> 天气搜索客户端</string>
    </property>
   </widget>
   <widget class="QLabel" name="label_6">
