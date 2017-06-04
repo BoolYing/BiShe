@@ -34,7 +34,7 @@
          </rect>
         </property>
         <property name="title">
-         <string>实时数据</string>
+         <string>近期天气预测</string>
         </property>
         <widget class="QWidget" name="layoutWidget">
          <property name="geometry">
@@ -226,11 +226,11 @@
            </property>
            <widget class="QWidget" name="tab_4">
             <attribute name="title">
-             <string>25号</string>
+             <string>今天</string>
             </attribute>
             <layout class="QVBoxLayout" name="verticalLayout_4">
              <item>
-              <widget class="QwtPlot" name="qwtPlot"/>
+              <widget class="QwtPlot" name="qwtPlot_0"/>
              </item>
             </layout>
            </widget>
@@ -240,7 +240,7 @@
             </attribute>
             <layout class="QVBoxLayout" name="verticalLayout_2">
              <item>
-              <widget class="QwtPlot" name="qwtPlot_2"/>
+              <widget class="QwtPlot" name="qwtPlot_1"/>
              </item>
             </layout>
            </widget>
@@ -250,37 +250,37 @@
             </attribute>
             <layout class="QVBoxLayout" name="verticalLayout_5">
              <item>
-              <widget class="QwtPlot" name="qwtPlot_5"/>
+              <widget class="QwtPlot" name="qwtPlot_2"/>
              </item>
             </layout>
            </widget>
            <widget class="QWidget" name="tab_7">
             <attribute name="title">
-             <string>28号</string>
+             <string>29号</string>
             </attribute>
-            <layout class="QVBoxLayout" name="verticalLayout_6">
+            <layout class="QVBoxLayout" name="verticalLayout_7">
              <item>
-              <widget class="QwtPlot" name="qwtPlot_6"/>
+              <widget class="QwtPlot" name="qwtPlot_3"/>
              </item>
             </layout>
            </widget>
            <widget class="QWidget" name="tab_8">
             <attribute name="title">
-             <string>29号</string>
+             <string>30号</string>
             </attribute>
-            <layout class="QVBoxLayout" name="verticalLayout_7">
+            <layout class="QVBoxLayout" name="verticalLayout_8">
              <item>
-              <widget class="QwtPlot" name="qwtPlot_7"/>
+              <widget class="QwtPlot" name="qwtPlot_4"/>
              </item>
             </layout>
            </widget>
            <widget class="QWidget" name="tab_9">
             <attribute name="title">
-             <string>30号</string>
+             <string>28号</string>
             </attribute>
-            <layout class="QVBoxLayout" name="verticalLayout_8">
+            <layout class="QVBoxLayout" name="verticalLayout_6">
              <item>
-              <widget class="QwtPlot" name="qwtPlot_8"/>
+              <widget class="QwtPlot" name="qwtPlot_5"/>
              </item>
             </layout>
            </widget>
@@ -290,7 +290,7 @@
             </attribute>
             <layout class="QVBoxLayout" name="verticalLayout_9">
              <item>
-              <widget class="QwtPlot" name="qwtPlot_9"/>
+              <widget class="QwtPlot" name="qwtPlot_6"/>
              </item>
             </layout>
            </widget>
@@ -355,42 +355,11 @@
        <attribute name="title">
         <string>关注城市</string>
        </attribute>
-       <widget class="QLabel" name="label_14">
-        <property name="geometry">
-         <rect>
-          <x>100</x>
-          <y>40</y>
-          <width>81</width>
-          <height>16</height>
-         </rect>
-        </property>
-        <property name="text">
-         <string>选择城市：</string>
-        </property>
-       </widget>
-       <widget class="QComboBox" name="comboBox">
-        <property name="geometry">
-         <rect>
-          <x>200</x>
-          <y>40</y>
-          <width>311</width>
-          <height>21</height>
-         </rect>
-        </property>
-       </widget>
-       <widget class="QPushButton" name="pushButton">
-        <property name="geometry">
-         <rect>
-          <x>870</x>
-          <y>40</y>
-          <width>93</width>
-          <height>28</height>
-         </rect>
-        </property>
-        <property name="text">
-         <string>查询</string>
-        </property>
-       </widget>
+      </widget>
+      <widget class="QWidget" name="tab_3">
+       <attribute name="title">
+        <string>全部数据</string>
+       </attribute>
        <widget class="QTableView" name="tableView">
         <property name="geometry">
          <rect>
@@ -401,11 +370,42 @@
          </rect>
         </property>
        </widget>
-      </widget>
-      <widget class="QWidget" name="tab_3">
-       <attribute name="title">
-        <string>全部数据</string>
-       </attribute>
+       <widget class="QPushButton" name="pushButton">
+        <property name="geometry">
+         <rect>
+          <x>880</x>
+          <y>40</y>
+          <width>93</width>
+          <height>28</height>
+         </rect>
+        </property>
+        <property name="text">
+         <string>查询</string>
+        </property>
+       </widget>
+       <widget class="QComboBox" name="comboBox">
+        <property name="geometry">
+         <rect>
+          <x>210</x>
+          <y>40</y>
+          <width>311</width>
+          <height>21</height>
+         </rect>
+        </property>
+       </widget>
+       <widget class="QLabel" name="label_14">
+        <property name="geometry">
+         <rect>
+          <x>110</x>
+          <y>40</y>
+          <width>81</width>
+          <height>16</height>
+         </rect>
+        </property>
+        <property name="text">
+         <string>选择城市：</string>
+        </property>
+       </widget>
       </widget>
      </widget>
     </item>

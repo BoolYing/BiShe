@@ -14,10 +14,19 @@
 #include <QByteArray>
 #include <QStringList>
 #include <QHostAddress>
+#include <map>
+#include <algorithm>
+#include <ostream>
+#include <QMap>
 
 #define VNAME(name) (#name)//用来输出变量名
 extern QString _UserName_;//使用main.cpp中定义的全局变量
-typedef QString Item[9]; //Item是一个包含了九个QString的数组
+
+typedef struct Item{
+    QString str[9];
+}Item;
+
+
 
 namespace Ui {
 class MainWindow;
@@ -44,6 +53,20 @@ private:
     QVector<Item> vector_weather7day;//用来存储大致天气信息的vrctor
     QVector<Item> vector_weather7day_full;//用来存储详细天气信息的vector
     QVector<Item> vector_city_code;//用来存储城市代码列表的vector
+    QMap<QString,QwtPlot *>str_2_qwt;
+    QMap<QString,QwtPlotCurve *>str_2_cur;
+    QVector<double> xs;//x轴数据
+    QVector<double> ys;//y轴数据
+
+    QwtPlotCurve *curve_0;
+    QwtPlotCurve *curve_1;
+    QwtPlotCurve *curve_2;
+    QwtPlotCurve *curve_3;
+    QwtPlotCurve *curve_4;
+    QwtPlotCurve *curve_5;
+    QwtPlotCurve *curve_6;
+
+
 
 
 private slots:
@@ -54,9 +77,11 @@ private slots:
     void get_user_info();
     void get_weather7day();
     void get_weather7day_full();
-    //void set_register_city();
+    void set_register_city();
     void get_city_code();
-
+    void update_weather_info();
+    void update_ui(QString city_code);
+    void on_listWidget_clicked(const QModelIndex &index);
 };
 
 /*
