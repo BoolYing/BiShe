@@ -18,6 +18,14 @@
 #include <algorithm>
 #include <ostream>
 #include <QMap>
+#include<QtSql/QSqlDatabase>
+#include<QDebug>
+#include<QThread>
+#include<QSqlError>
+#include<QSqlQuery>
+#include<QSqlRelationalTableModel>
+#include<QSqlError>
+
 
 #define VNAME(name) (#name)//用来输出变量名
 extern QString _UserName_;//使用main.cpp中定义的全局变量
@@ -48,11 +56,17 @@ private:
     QTcpSocket * user_info_Socket; //用来查询用户信息的套接字指针
     QTcpSocket * weather7day_Socket;//用来查询大致天气的套接字指针
     QTcpSocket * weather7day_full_Socket;//用来查询未来七天详细信息的套接字指针
+    QTcpSocket * city_Socket; //用来通过城市代码查询城市名的套接字指针
 
     QVector<QString> vector_user_info;//存储用户注册城市的vector
     QVector<Item> vector_weather7day;//用来存储大致天气信息的vrctor
     QVector<Item> vector_weather7day_full;//用来存储详细天气信息的vector
     QVector<Item> vector_city_code;//用来存储城市代码列表的vector
+
+    QSet<QString> province_set;//用来存储省、市、区域的集合
+    QSet<QString> city_set;
+    QSet<QString> area_set;
+
     QMap<QString,QwtPlot *>str_2_qwt;
     QMap<QString,QwtPlotCurve *>str_2_cur;
     QVector<double> xs;//x轴数据
@@ -66,7 +80,8 @@ private:
     QwtPlotCurve *curve_5;
     QwtPlotCurve *curve_6;
 
-
+    QSqlRelationalTableModel * model; //历史数据-->表格
+    QSqlDatabase db;
 
 
 private slots:
@@ -77,13 +92,22 @@ private slots:
     void get_user_info();
     void get_weather7day();
     void get_weather7day_full();
-    void set_register_city();
+
     void get_city_code();
+    QString get_city(QString city_code);
+    //void get_province();
+    //void get_city();
+    //void get_area();
+
     void update_weather_info();
     void update_ui(QString city_code);
     void on_listWidget_clicked(const QModelIndex &index);
     void on_pushButton_2_clicked();
     void on_pushButton_3_clicked();
+    void on_listWidget_2_clicked(const QModelIndex &index);
+    void on_listWidget_3_clicked(const QModelIndex &index);
+
+    void on_pushButton_clicked();
 };
 
 /*

@@ -7,6 +7,10 @@ MainWindow::MainWindow(QWidget *parent) :
 {
     ui->setupUi(this);
     qDebug() << "username is :"<<_UserName_;
+
+    //QSqlRelationalTableModel的行为类似于QSqlTableModel，但允许将列设置为外键到其他数据库表。
+    model = new QSqlRelationalTableModel(this);
+
     //创建七条曲线，用来存储未来七天数据。
     curve_0=new QwtPlotCurve();
     curve_1=new QwtPlotCurve();
@@ -32,6 +36,20 @@ MainWindow::MainWindow(QWidget *parent) :
     str_2_cur.insert("curve_5",curve_5);
     str_2_cur.insert("curve_6",curve_6);
 
+    db = QSqlDatabase::addDatabase("QMYSQL");
+    db.setHostName("192.168.19.128");
+    db.setDatabaseName("bs_db)");  //设置数据库名称
+    db.setUserName("root");  //设置用户名
+    db.setPassword("123456");  //设置密码
+    db.setPort(3306);
+
+    if(!db.open()){     //连接数据库失败
+        qDebug()<<"failed to connect to MySql";
+    }
+    else               //连接成功
+    {
+        qDebug()<<"connect to MySql success!";
+    }
 
 
     //设置所有qwtplot的轴的意义解释
@@ -66,6 +84,7 @@ MainWindow::MainWindow(QWidget *parent) :
     user_info_Socket       = new QTcpSocket(this);
     weather7day_Socket     = new QTcpSocket(this);
     weather7day_full_Socket= new QTcpSocket(this); 
+    city_Socket            = new QTcpSocket(this);
 
     on_pushButton_3_clicked();//主动触发一次更新数据与更新ui的操作
 
@@ -77,6 +96,8 @@ MainWindow::MainWindow(QWidget *parent) :
     connect(user_info_Socket,SIGNAL(error(QAbstractSocket::SocketError)),this,SLOT(displayError(QAbstractSocket::SocketError)));
     connect(weather7day_Socket,SIGNAL(error(QAbstractSocket::SocketError)),this,SLOT(displayError(QAbstractSocket::SocketError)));
     connect(weather7day_full_Socket,SIGNAL(error(QAbstractSocket::SocketError)),this,SLOT(displayError(QAbstractSocket::SocketError)));
+
+    get_city_code();
 }
 
 MainWindow::~MainWindow()
@@ -135,24 +156,25 @@ void MainWindow::get_user_info(){
     user_info_Socket->write(info.toLocal8Bit());
     if(user_info_Socket->waitForReadyRead(3000)){ //有数据可读则返回
         buf = readMessage(user_info_Socket);//读取数据
-        //qDebug()<<buf;
+        qDebug()<<"user_info :"<<buf.size()<<"--->"<<buf;
         QStringList list;
         list = buf.split(",");
+        ui->comboBox->clear();
         for(int i = 0;i <list.size();i++){
             if(list.at(i)=="") continue;
             vector_user_info.push_back(list.at(i));
             ui->listWidget->addItem(list.at(i));
-            qDebug() << list.at(i);
+            ui->comboBox->addItem(list.at(i));//添加到历史数据->选择设备comboBox中
+            //qDebug() << list.at(i);
         }
     }
 }
 
-void MainWindow::set_register_city(){
-
-}
-
 //获取全国省、区、县的天气代码
 void MainWindow::get_city_code(){
+    province_set.clear();//清空集合
+    city_set.clear();
+    area_set.clear();
     QString buf;
     user_info_Socket->abort(); //取消已有的连接
     QString request = "5";
@@ -160,12 +182,13 @@ void MainWindow::get_city_code(){
     city_code_Socket->write(request.toLocal8Bit());
     if(city_code_Socket->waitForReadyRead(3000)){ //有数据可读则返回
         buf = readMessage(city_code_Socket);//读取数据
-        //qDebug()<<buf;
+        qDebug()<<"city_code :"<<buf.size()<<"--->"<<buf;
         QStringList item_list;
         item_list = buf.split(";");
+        qDebug()<<"item nums -->"<<item_list.size();
         for(int i = 0;i <item_list.size();i++){
             if(item_list.at(i)=="") continue;
-            qDebug()<<item_list.at(i);
+            //qDebug()<<item_list.at(i);
             QStringList value_list = QString(item_list.at(i)).split(",");
             Item item;
             for(int j = 0;j< value_list.size();j++){
@@ -176,6 +199,15 @@ void MainWindow::get_city_code(){
             vector_city_code.push_back(item);
             //qDebug()<<item[0]<<","<<item[1]<<","<<item[2]<<","<<item[3]<<","<<item[4]<<","<<item[5]<<","<<item[6]<<","<<item[7];
         }
+    }
+    QVector<Item>::iterator it;
+    QSet<QString>::iterator jt;
+    //QString temp;
+    for(it = vector_city_code.begin();it!=vector_city_code.end();it++){
+        province_set.insert(it->str[0]);
+    }
+    for(jt = province_set.begin();jt != province_set.end();jt++){
+        ui->listWidget_2->addItem(*jt);
     }
 }
 
@@ -189,12 +221,12 @@ void MainWindow::get_weather7day(){
     weather7day_Socket->write(info.toLocal8Bit());
     if(weather7day_Socket->waitForReadyRead(3000)){ //有数据可读则返回
         buf = readMessage(weather7day_Socket);//读取数据
-        qDebug()<<buf.size()<<"    -->"<<buf;
+        qDebug()<<"weather7day :"<<buf.size()<<"--->"<<buf;
         QStringList item_list;
         item_list = buf.split(";");
         for(int i = 0;i <item_list.size();i++){
             if(item_list.at(i)=="") continue;
-            qDebug()<<item_list.at(i);
+            //qDebug()<<item_list.at(i);
             QStringList value_list = QString(item_list.at(i)).split(",");
             Item item;
             for(int j = 0;j< value_list.size();j++){
@@ -218,13 +250,12 @@ void MainWindow::get_weather7day_full(){
     weather7day_full_Socket->write(info.toLocal8Bit());
     if(weather7day_full_Socket->waitForReadyRead(3000)){ //有数据可读则返回
         buf = readMessage(weather7day_full_Socket);//读取数据
-
-        qDebug()<<buf.size()<<"    -->"<<buf;
+        qDebug()<<"weather7day_full :"<<buf.size()<<"--->"<<buf;
         QStringList item_list;
         item_list = buf.split(";");
         for(int i = 0;i <item_list.size();i++){
             if(item_list.at(i)=="") continue;
-            qDebug()<<item_list.at(i);
+            //qDebug()<<item_list.at(i);
             QStringList value_list = QString(item_list.at(i)).split(",");
             Item item;
             for(int j = 0;j< value_list.size();j++){
@@ -276,6 +307,7 @@ void MainWindow::update_ui(QString city_code){
             temp_full.push_back(*it);
         }
     }
+
     int cnt = 0;
     for(it = temp.begin();it != temp.end();it++,cnt++){
         xs.clear();//清除保存的数据
@@ -305,18 +337,28 @@ void MainWindow::update_ui(QString city_code){
         str_2_qwt[QString("qwtPlot_")+QString(cnt_str)]->replot();
     }
 
-/*    qDebug()<<"testtttttttt-->"<<temp_full[0].str[1];
-    qDebug()<<"String size-->"<<temp_full[0].str[1].size();
+    QString city = get_city(city_code);
+    QString wea = temp[0].str[3];
+    QString tmp = QString(QString(temp_full[0].str[3][0])+QString(temp_full[0].str[3][1]));
+    QString winf = temp_full[0].str[4];
+    QString winl = temp_full[0].str[5];
+    QString datetime = temp_full[0].str[1];
 
-    qDebug()<<"Date-->"<<QString(
-                                 QString(temp_full[0].str[1][0])
-                                +QString(temp_full[0].str[1][1])
-                                ).toInt();
-    qDebug()<<"Time-->"<<QString(
-                                 QString(temp_full[0].str[1][3])
-                                +QString(temp_full[0].str[1][4])
-                                ).toInt();
-*/
+    qDebug()<<city;
+    qDebug()<<wea;
+    qDebug()<<tmp;
+    qDebug()<<winf;
+    qDebug()<<winl;
+    qDebug()<<datetime;
+
+    ui->label_3->setText(city);//城市
+    ui->label_5->setText(tmp);//温度
+    ui->label_7->setText(winf);//风向
+    ui->label_9->setText(datetime);//日期
+    ui->label_11->setText(wea);//气象
+    ui->label_13->setText(winl);//风速
+
+
 }
 
 void MainWindow::update_weather_info(){
@@ -332,11 +374,26 @@ void MainWindow::update_weather_info(){
 //注册城市
 void MainWindow::on_pushButton_2_clicked()
 {
-    QString province = ui->listWidget_2->currentItem()->text();
-    QString city = ui->listWidget_3->currentItem()->text();
     QString area = ui->listWidget_4->currentItem()->text();
-
-
+    QString city_code;
+    QVector<Item> ::iterator it;
+    for(it = vector_city_code.begin();it != vector_city_code.end();it++){
+        if(it->str[2] == area) {
+            city_code = it->str[3];
+            break;
+        }
+    }
+    QString buf;
+    city_code_Socket->abort(); //取消已有的连接
+    QString request = "6";
+    QString info = _UserName_+ QString(",") + city_code;
+    city_code_Socket->connectToHost(QHostAddress("192.168.19.128"),8955);
+    city_code_Socket->write(request.toLocal8Bit());
+    city_code_Socket->write(info.toLocal8Bit());
+    if(city_code_Socket->waitForReadyRead(3000)){ //有数据可读则返回
+        buf = readMessage(city_code_Socket);//读取数据
+        qDebug()<<buf;
+    }
 }
 //更新数据，并刷新ui
 void MainWindow::on_pushButton_3_clicked()
@@ -347,11 +404,78 @@ void MainWindow::on_pushButton_3_clicked()
 //选择省，则更新对应的市
 void MainWindow::on_listWidget_2_clicked(const QModelIndex &index)
 {
+    city_set.clear();
+    area_set.clear();
+    ui->listWidget_3->clear();//选择了一个省后，清空ui上市、区的列表
+    ui->listWidget_4->clear();
 
-
+    QString province= ui->listWidget_2->currentItem()->text();
+    QVector<Item>::iterator it;
+    QSet<QString>::iterator jt;
+    for(it = vector_city_code.begin();it != vector_city_code.end();it++){
+        if(it->str[0] == province) {
+            city_set.insert(it->str[1]);
+        }
+    }
+    for(jt = city_set.begin();jt != city_set.end();jt++){
+        ui->listWidget_3->addItem(*jt);
+    }
 }
 //选择市，则更新对应的区
 void MainWindow::on_listWidget_3_clicked(const QModelIndex &index)
 {
+    area_set.clear();
+    ui->listWidget_4->clear();//选择了一个省后，清空ui区域的列表
+    QString city= ui->listWidget_3->currentItem()->text();
+    QVector<Item>::iterator it;
+    QSet<QString>::iterator jt;
+    for(it = vector_city_code.begin();it != vector_city_code.end();it++){
+        if(it->str[1] == city) {
+            area_set.insert(it->str[2]);
+        }
+    }
+    for(jt = area_set.begin();jt != area_set.end();jt++){
+        ui->listWidget_4->addItem(*jt);
+    }
 
+}
+
+QString MainWindow::get_city(QString city_code){
+    QString buf;
+    city_Socket->abort(); //取消已有的连接
+    QString request = "7";
+    city_Socket->connectToHost(QHostAddress("192.168.19.128"),8955);
+    city_Socket->write(request.toLocal8Bit());
+    city_Socket->write(city_code.toLocal8Bit());
+    if(city_Socket->waitForReadyRead(3000)){ //有数据可读则返回
+        buf = readMessage(city_Socket);//读取数据
+        qDebug()<<"city :"<<buf.size()<<"--->"<<buf;
+        return buf;
+    }
+}
+
+//表格显示查找的信息
+void MainWindow::on_pushButton_clicked()
+{
+    QString city_code = ui->comboBox->currentText();
+    model->setTable("weather7day_full");//设置表名
+    model->setFilter(QString("city_code='%1'").arg(city_code));
+    //OnManualSubmit：所有更改将缓存在模型中，直到submitAll（）或revertAll（）被调用。
+    model->setEditStrategy(QSqlTableModel::OnManualSubmit);
+
+    if(model->select())//查询
+    {
+        qDebug()<<"on_pushButton_clicked() select OK.";
+        ui->tableView->setModel(model);
+        ui->tableView->setSelectionBehavior(QAbstractItemView::SelectRows);//一次直接选中整行
+        ui->tableView->setEditTriggers(QAbstractItemView::NoEditTriggers);//无法编辑当前行
+        //ui->tableView->resizeColumnToContents (8); //根据内容长度，自动调整第8列的宽度
+        //ui->tableView->resizeColumnToContents (1); //根据内容长度，自动调整第1列的宽度
+        //ui->tableView->horizontalHeader()->setResizeMode(0, QHeaderView::Fixed);
+    }
+    else{
+        qDebug()<<"on_pushButton_clicked()select Wrong.";
+        QSqlError error = db.lastError();
+        qDebug()<<error.text();
+    }
 }
