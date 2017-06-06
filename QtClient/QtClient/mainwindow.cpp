@@ -38,7 +38,7 @@ MainWindow::MainWindow(QWidget *parent) :
 
     db = QSqlDatabase::addDatabase("QMYSQL");
     db.setHostName("192.168.19.128");
-    db.setDatabaseName("bs_db)");  //设置数据库名称
+    db.setDatabaseName("bs_db");  //设置数据库名称
     db.setUserName("root");  //设置用户名
     db.setPassword("123456");  //设置密码
     db.setPort(3306);
@@ -339,10 +339,10 @@ void MainWindow::update_ui(QString city_code){
 
     QString city = get_city(city_code);
     QString wea = temp[0].str[3];
-    QString tmp = QString(QString(temp_full[0].str[3][0])+QString(temp_full[0].str[3][1]));
+    QString tmp = QString(QString(temp_full[3].str[3][0])+QString(temp_full[3].str[3][1]));
     QString winf = temp_full[0].str[4];
     QString winl = temp_full[0].str[5];
-    QString datetime = temp_full[0].str[1];
+    QString datetime = temp_full[3].str[1];
 
     qDebug()<<city;
     qDebug()<<wea;
