@@ -1,4 +1,4 @@
-#ifndef MAINWINDOW_H
+﻿#ifndef MAINWINDOW_H
 #define MAINWINDOW_H
 
 #include <QMainWindow>
@@ -25,7 +25,7 @@
 #include<QSqlQuery>
 #include<QSqlRelationalTableModel>
 #include<QSqlError>
-
+#include<QTextCodec>
 
 #define VNAME(name) (#name)//用来输出变量名
 extern QString _UserName_;//使用main.cpp中定义的全局变量

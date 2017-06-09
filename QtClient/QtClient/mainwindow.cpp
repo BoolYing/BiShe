@@ -9,7 +9,7 @@ MainWindow::MainWindow(QWidget *parent) :
     qDebug() << "username is :"<<_UserName_;
 
     //QSqlRelationalTableModel的行为类似于QSqlTableModel，但允许将列设置为外键到其他数据库表。
-    model = new QSqlRelationalTableModel(this);
+
 
     //创建七条曲线，用来存储未来七天数据。
     curve_0=new QwtPlotCurve();
@@ -50,6 +50,7 @@ MainWindow::MainWindow(QWidget *parent) :
     {
         qDebug()<<"connect to MySql success!";
     }
+    model = new QSqlRelationalTableModel(this);
 
 
     //设置所有qwtplot的轴的意义解释
@@ -457,6 +458,7 @@ QString MainWindow::get_city(QString city_code){
 //表格显示查找的信息
 void MainWindow::on_pushButton_clicked()
 {
+     QTextCodec::setCodecForLocale(QTextCodec::codecForName("UTF8"));
     QString city_code = ui->comboBox->currentText();
     model->setTable("weather7day_full");//设置表名
     model->setFilter(QString("city_code='%1'").arg(city_code));
@@ -465,6 +467,7 @@ void MainWindow::on_pushButton_clicked()
 
     if(model->select())//查询
     {
+
         qDebug()<<"on_pushButton_clicked() select OK.";
         ui->tableView->setModel(model);
         ui->tableView->setSelectionBehavior(QAbstractItemView::SelectRows);//一次直接选中整行

@@ -8,9 +8,9 @@
 QT       += core gui sql network
 
 DEFINES += QT_DLL QWT_DLL
-LIBS += -L"C:\Qt\Qt5.8.0\5.8\msvc2015_64\lib" -lqwtd
-LIBS += -L"C:\Qt\Qt5.8.0\5.8\msvc2015_64\lib" -lqwt
-INCLUDEPATH += C:\Qt\Qt5.8.0\5.8\msvc2015_64\include\Qwt
+LIBS += -L"C:\Qt\5.9\msvc2017_64\lib" -lqwtd
+LIBS += -L"C:\Qt\5.9\msvc2017_64\lib" -lqwt
+INCLUDEPATH += C:\Qt\5.9\msvc2017_64\include\Qwt
 
 
 greaterThan(QT_MAJOR_VERSION, 4): QT += widgets
